@@ -25,4 +25,8 @@ dist-ssr
 
 # Environment variables
 .env
+.env.local
 .env.*
+
+# Node modules
+node_modules/
