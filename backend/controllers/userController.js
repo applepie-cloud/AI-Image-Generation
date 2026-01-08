@@ -1,4 +1,4 @@
-import userModel from "../models/usermodel";
+import userModel from "../models/usermodel.js";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
@@ -9,13 +9,13 @@ const hashPassword = async (password) => {
     return hashedpass;
 }
 
-const registerUser = async (req,res) => {
+export const registerUser = async (req,res) => {
     try {
         const { username, password, email} = req.body;
         if(!username || !email || !password) {
             return res.json({ success : false, message : "missing credentials"});
         }
-        hashedpass = hashPassword(password);
+        const hashedpass = await hashPassword(password);
         const userData = {
             name : username,
             email : email,
@@ -35,7 +35,7 @@ const registerUser = async (req,res) => {
     }
 }
 
-const loginUser = async (req,res) => {
+export const loginUser = async (req,res) => {
     try {
         const { email, password } = req.body;
         const foundUser = await userModel.findOne({ email });
@@ -55,5 +55,22 @@ const loginUser = async (req,res) => {
     } catch (err) {
         console.log(err);
         return res.json({ success : false, message : err.message});
+    }
+}
+
+export const userCredits = async (req,res) => {
+    try {
+        const { id } = req.body;
+
+        const user = await userModel.findById(id);
+
+        if(!user) {
+            return res.status(404).json({success: false,message : "user not found"});
+        }
+
+        return res.json({ success : true,credits : user.creditBalance , name : user.name });
+    }catch (err) {
+        console.log(err);
+        return res.json({success : false,message : err.message});
     }
 }
